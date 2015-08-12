@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\MyValidator;
 use Illuminate\Http\Request;
-
+use Illuminate\Http\JsonResponse;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
-use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Hash;
+use Log;
 
 
 class TokenAuthController extends Controller
@@ -57,12 +58,35 @@ class TokenAuthController extends Controller
     }
 
     public function register(Request $request){
+        $input = $request->all();
+        $v = MyValidator::validateRegisterRequest($input);
+        if ($v->fails()){
+            return new jsonResponse([
+                'message' => $v->errors()->first(),
+            ], 403);
+        }
+        $user = new User();
+        $user->email = $input['email'];
+        $user->name = $input['name'];
+        $user->username = $input['username'];
+        $user->password = Hash::make($input['password']);
+        $user->mobile_no = $input['mobile_no'];
+        $user->confirmed = 0;
+        $user->confirmation_code = "";
+        $user->pin_no = $input['pin_no'];
+        $insert = $user->save();
+        if ($insert){
+            return new jsonResponse([
+                'message' => 'Registered successfully.',
+            ], 201);
+        } else {
+            return new jsonResponse([
+                'message' => 'Register failed.',
+            ], 403);
+        }
+    }
 
-        $newuser= $request->all();
-        $password=Hash::make($request->input('password'));
-
-        $newuser['password'] = $password;
-
-        return User::create($newuser);
+    public function resetPasswordRequest(){
+        $input = $request->all();
     }
 }
