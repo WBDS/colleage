@@ -1,7 +1,5 @@
 <?php
 
-header('Access-Control-Allow-Origin: *');
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -17,11 +15,8 @@ Route::get('/', function () {
     return 'GET hello dude!';
 });
 
-Route::group(['prefix' => 'api_v1'], function () {
+Route::group(['prefix' => 'api/1'], function () {
 
-Route::get('test', function(){
-   return 'this is test page';
-});
 //User Account routes
 Route::post('users/register', 'TokenAuthController@register');
 Route::post('users/login', 'TokenAuthController@authenticate');
